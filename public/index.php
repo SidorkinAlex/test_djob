@@ -31,7 +31,7 @@ $container->set(
 
 
 $app = new Micro($container);
-
+// получение списка
 $app->get(
     '/api/contacts',
     function () use ($app) {
@@ -59,7 +59,39 @@ $app->get(
         echo json_encode($data);
     }
 );
+// получение конкретной записи по id
+$app->get(
+    '/api/contacts',
+    function ($id) use ($app) {
+        $phql = 'SELECT * '
+            . 'FROM MyApp\Models\Contacts '
+            . 'WHERE id = :id: '
+        ;
 
+        $robots = $app
+            ->modelsManager
+            ->executeQuery(
+                $phql,
+                [
+                    'id' =>   $id
+                ]
+            )
+        ;
+
+        $data = [];
+
+        foreach ($robots as $robot) {
+            $data[] = [
+                'id'   => $robot->id,
+                'lastName' => $robot->lastName,
+                'firstName' => $robot->firstName,
+                'middleName' => $robot->middleName,
+            ];
+        }
+
+        echo json_encode($data);
+    }
+);
 $app->handle(
     $_SERVER["REQUEST_URI"]
 );
