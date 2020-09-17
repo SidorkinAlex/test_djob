@@ -215,14 +215,13 @@ $app->put(
     }
 );
 
-// Удаление
+// Удаление curl -i -X DELETE http://0.0.0.0/api/contact/ef553cb7-f796-11ea-8fca-0242ac110002
 
-// Deletes robots based on primary key
 $app->delete(
-    '/api/robots/{id:[0-9]+}',
+    '/api/contact/{id}',
     function ($id) use ($app) {
         $phql = 'DELETE '
-            . 'FROM MyApp\Models\Robots '
+            . 'FROM MyApp\Models\Contacts '
             . 'WHERE id = :id:';
 
         $status = $app
