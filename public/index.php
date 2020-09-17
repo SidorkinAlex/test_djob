@@ -103,6 +103,7 @@ $app->post(
         $random = new \Phalcon\Security\Random();
         $guid=$random->uuid();
         $contact = $app->request->getJsonRawBody();
+        var_export($contact);
         $phql  = 'INSERT INTO MyApp\Models\Contacts '
             . '(id, lastName, firstName, middleName) '
             . 'VALUES '
@@ -156,9 +157,111 @@ $app->post(
 );
 
 // Изменение записей в таблице
+// curl -i -X PUT -d '{"lastName":"Testov","firstName":"Test","middleName":"Testovich"}'  http://0.0.0.0/api/contact/ef553cb7-f796-11ea-8fca-0242ac110002
+$app->put(
+    '/api/contact/{id}',
+    function ($id) use ($app) {
+        $contact = $app->request->getJsonRawBody();
+        $set_arr=[];
+        foreach ($contact as $key=>$val){
+            if($key != 'id') {
+                $set_arr[] = "$key = :{$key}:";
+            }
+        }
+        $set=" SET ". implode(',',$set_arr)." ";
 
+        $phql  = 'UPDATE MyApp\Models\Contacts '
+            . $set
+            . 'WHERE id = :id:';
+        echo $phql;
+        $status = $app
+            ->modelsManager
+            ->executeQuery(
+                $phql,
+                [
+                    'id' => $id,
+                    'lastName' => $contact->lastName,
+                    'firstName' => $contact->firstName,
+                    'middleName' => $contact->middleName,
+                ]
+            )
+        ;
 
+        $response = new Response();
 
+        if ($status->success() === true) {
+            $response->setJsonContent(
+                [
+                    'status' => 'OK'
+                ]
+            );
+        } else {
+            $response->setStatusCode(409, 'Conflict');
+
+            $errors = [];
+            foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }
+
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => $errors,
+                ]
+            );
+        }
+
+        return $response;
+    }
+);
+
+// Удаление
+
+// Deletes robots based on primary key
+$app->delete(
+    '/api/robots/{id:[0-9]+}',
+    function ($id) use ($app) {
+        $phql = 'DELETE '
+            . 'FROM MyApp\Models\Robots '
+            . 'WHERE id = :id:';
+
+        $status = $app
+            ->modelsManager
+            ->executeQuery(
+                $phql,
+                [
+                    'id' => $id,
+                ]
+            )
+        ;
+
+        $response = new Response();
+
+        if ($status->success() === true) {
+            $response->setJsonContent(
+                [
+                    'status' => 'OK'
+                ]
+            );
+        } else {
+            $response->setStatusCode(409, 'Conflict');
+
+            $errors = [];
+            foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }
+
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => $errors,
+                ]
+            );
+        }
+
+        return $response;
+    }
+);
 
 $app->handle(
     $_SERVER["REQUEST_URI"]
