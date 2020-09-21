@@ -16,6 +16,8 @@ class ApiController extends Controller
     }
 
     /**
+     * Получение списка Контактов метод GET curl --location --request GET 'http://0.0.0.0/api/contacts/'
+     * Получение записи Контакта по id метод GET curl --location --request GET 'http://0.0.0.0/api/contacts/cedec9fc-f8a3-11ea-acd6-0242ac110002'
      * @param null $id
      * @return bool
      */
