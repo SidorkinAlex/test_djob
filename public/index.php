@@ -6,9 +6,6 @@ use Phalcon\Mvc\View;
 use Phalcon\Mvc\Application;
 use Phalcon\Url;
 use Phalcon\Mvc\Micro;
-use Phalcon\Http\Response;
-use \Phalcon\Security\Random;
-use Phalcon\Db\Adapter\Pdo\Mysql as PdoMysql;
 
 // Define some absolute path constants to aid in locating resources
 define('BASE_PATH', dirname(__DIR__));
