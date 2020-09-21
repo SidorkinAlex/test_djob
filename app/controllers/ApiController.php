@@ -39,7 +39,7 @@ class ApiController extends Controller
 
     /**
      * Добавление записи метод POST
-     * curl --location --request DELETE 'http://0.0.0.0/api/contactadd' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'data={"lastName":"Sysykin11","firstName":"Sysyck","middleName":"Sysykovich"}'
+     * curl --location --request POST 'http://0.0.0.0/api/contactadd' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'data={"lastName":"Sysykin11","firstName":"Sysyck","middleName":"Sysykovich"}'
      * @return Response
      */
     public function contactaddAction()
