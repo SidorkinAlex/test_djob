@@ -6,6 +6,7 @@
  * Time: 16:24
  */
 use Phalcon\Mvc\Controller;
+use Phalcon\Http\Response;
 
 class ApiController extends Controller
 {
@@ -14,6 +15,10 @@ class ApiController extends Controller
         $this->view->disable();
     }
 
+    /**
+     * @param null $id
+     * @return bool
+     */
     public function contactsAction($id=null)
     {
         // Если GET запросы выводим
@@ -28,6 +33,53 @@ class ApiController extends Controller
                 return true;
             }
         }
+    }
+
+    public function contactaddAction()
+    {
+        // Если POST запрос сохраняем запись
+        $response = new Response();
+        if ($this->request->isPost()) {
+            $data = json_decode($this->request->getPost('data'), 1);
+            if (!empty($data)) {
+                $contact = new MyApp\Models\Contacts();
+                $contact->lastName = $data['lastName'];
+                $contact->firstName = $data['firstName'];
+                $contact->middleName = $data['middleName'];
+                $result = $contact->save();
+                if ($result) {
+                    $response->setStatusCode(201, 'Created');
+
+                    $response->setJsonContent(
+                        [
+                            'status' => 'OK',
+                            'data' => $contact->id,
+                        ]
+                    );
+                    return $response;
+
+                } else {
+                    //Если данные не сохранены
+                    $error = "ERROR from Saving";
+                }
+            }
+            // Если пустой массив данных
+            if (!isset($error)) {
+                $error = "ERROR data is empty";
+            }
+        }
+        // Если метод не POST
+        if (!isset($error)) {
+            $error = "ERROR data is empty";
+        }
+        $response->setStatusCode(409, 'Conflict');
+        $response->setJsonContent(
+            [
+                'status' => 'ERROR',
+                'messages' => $error,
+            ]
+        );
+        return $response;
     }
 
     private function showAllList(){

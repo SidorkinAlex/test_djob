@@ -7,12 +7,14 @@ use Phalcon\Messages\Message;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\Uniqueness;
 use Phalcon\Validation\Validator\InclusionIn;
+use \Phalcon\Security\Random;
 
 class Contacts extends Model
 {
-    public function validation()
+    public function initialize()
     {
-
+        $random = new \Phalcon\Security\Random();
+        $this->id=$random->uuid();
     }
 
     /**
@@ -34,6 +36,10 @@ class Contacts extends Model
         return $data;
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
     static function get_from_id($id){
         $contacts = self::find(
             [
