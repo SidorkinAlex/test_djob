@@ -4,6 +4,9 @@ use Phalcon\Mvc\Controller;
 
 class IndexController extends Controller
 {
+    /**
+     * страница просмотра для работы с контактами через браузер
+     */
     public function indexAction()
     {
         $contacts = MyApp\Models\Contacts::find();
@@ -21,6 +24,10 @@ class IndexController extends Controller
         $this->view->setVar('data',$data);
     }
 
+    /**
+     * Поиск на странице контактов
+     * @param string $contactSerch фраза для полнотекстного поиска
+     */
     public function serchAction($contactSerch=''){
         $contactSerch=urldecode ($contactSerch );
         global $app;
