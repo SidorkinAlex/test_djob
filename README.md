@@ -12,6 +12,9 @@
 ## Инструкции для тестрирования
 1.по умолчанию инстанс подключается к базе:
 
+Конфиг подключения к базе лежит в 
+>app/config/config.php
+
 'host'     => 'localhost',
 
 'username' => 'docker',
@@ -28,20 +31,22 @@
 
 3.1. Чтение записей из таблицы
 
-> (всех запией) curl -i -X GET http://0.0.0.0/api/contact
+> (всех запией) curl --location --request GET 'http://0.0.0.0/api/contacts/'
 
-> (конкретной записи) curl -i -X GEThttp://0.0.0.0/api/contact/{id}
+> (конкретной записи) GET curl --location --request GET 'http://0.0.0.0/api/contacts/{id}'
+
 3.2. Добавление записей в таблицу;
 
-> curl -i -X POST -d '{"lastName":"Sysykin","firstName":"Sysyck","middleName":"Sysykovich"}'     http://0.0.0.0/api/contactadd
+> curl --location --request POST 'http://0.0.0.0/api/contactadd' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'data={"lastName":"Sysykin,"firstName":"Sysyck","middleName":"Sysykovich"}'
 
 3.3. Изменение записей в таблице;
 
-> curl -i -X PUT -d '{"lastName":"Testov","firstName":"Test","middleName":"Testovich"}'  http://0.0.0.0/api/contact/ef553cb7-f796-11ea-8fca-0242ac110002
+> curl --location --request PUT 'http://0.0.0.0/api/contact/{id}'  --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'data={"lastName":"Sysykin11","firstName":"Sysyck","middleName":"Sysykovich"}'
 
 3.4. Удаление записей в таблице;
 
-> curl -i -X DELETE http://0.0.0.0/api/contact/ef553cb7-f796-11ea-8fca-0242ac110002
+>> curl -i -X DELETE http://0.0.0.0/api/contact/{id}
+
 
 4.На отдельной странице вывести интерфейс для работы с таблицей;
 
