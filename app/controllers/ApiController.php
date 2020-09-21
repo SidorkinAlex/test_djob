@@ -35,6 +35,11 @@ class ApiController extends Controller
         }
     }
 
+    /**
+     * Добавление записи метод POST
+     * curl --location --request DELETE 'http://0.0.0.0/api/contactadd' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'data={"lastName":"Sysykin11","firstName":"Sysyck","middleName":"Sysykovich"}'
+     * @return Response
+     */
     public function contactaddAction()
     {
         // Если POST запрос сохраняем запись
@@ -70,7 +75,44 @@ class ApiController extends Controller
         }
         // Если метод не POST
         if (!isset($error)) {
-            $error = "ERROR data is empty";
+            $error = "ERROR method is not POST";
+        }
+        $response->setStatusCode(409, 'Conflict');
+        $response->setJsonContent(
+            [
+                'status' => 'ERROR',
+                'messages' => $error,
+            ]
+        );
+        return $response;
+    }
+
+    /**
+     * Обновление контактов метод PUT
+     * curl --location --request PUT 'http://0.0.0.0/api/contact/ef54e12a-f796-11ea-8fca-0242ac110002'  --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'data={"lastName":"Sysykin11","firstName":"Sysyck","middleName":"Sysykovich"}'
+     * Удаление данных метод DELETE
+     * curl --location --request DELETE 'http://0.0.0.0/api/contact/ef54e12a-f796-11ea-8fca-0242ac110002'
+     *
+     * @param $id
+     * @return Response
+     */
+    public function contactAction($id)
+    {
+        // Если PUT запрос Обновляем запись
+        $response = new Response();
+        if ($this->request->isPut()) {
+            $data = json_decode($this->request->getPut('data'), 1);
+            $response=$this->contactUpdate($id,$data,$response);
+            return $response;
+        }
+
+        if($this->request->isDelete()){
+            $response=$this->contactDelete($id,$response);
+            return $response;
+        }
+        // Если метод не PUT или DELETE
+        if (!isset($error)) {
+            $error = "ERROR method is not PUT or DELETE";
         }
         $response->setStatusCode(409, 'Conflict');
         $response->setJsonContent(
@@ -92,5 +134,90 @@ class ApiController extends Controller
         echo json_encode($contact);
     }
 
+    /**
+     * Обновление данных по id
+     * @param $id
+     * @param array $data
+     * @param Response $response
+     * @return Response
+     */
+    private function contactUpdate($id,$data,Response $response){
+        $response->setStatusCode(409, 'Conflict');
+        if (!empty($data)) {
+            $contact =  MyApp\Models\Contacts::findFirst("id = '{$id}'");
+            if(!empty($data['lastName'])) {
+                $contact->lastName = $data['lastName'];
+            }
+            if(!empty($data['firstName'])) {
+                $contact->firstName = $data['firstName'];
+            }
+            if(!empty($data['middleName'])) {
+                $contact->middleName = $data['middleName'];
+            }
+            $result = $contact->save();
+            if ($result) {
+                $response->setStatusCode(200, 'Updated');
+
+                $response->setJsonContent(
+                    [
+                        'status' => 'OK',
+                        'data' => $contact->id,
+                    ]
+                );
+                return $response;
+
+            } else {
+                //Если данные не сохранены
+                $response->setJsonContent(
+                    [
+                        'status' => 'ERROR',
+                        'messages' => 'ERROR from Saving',
+                    ]);
+                return $response;
+            }
+        }
+        // Если пустой массив данных
+        $response->setJsonContent(
+            [
+                'status' => 'ERROR',
+                'messages' => 'ERROR data is empty',
+            ]);
+
+        return $response;
+    }
+
+    /**
+     * удаление записи по id
+     * @param $id
+     * @param Response $response
+     * @return Response
+     */
+    private function contactDelete($id, Response $response)
+    {
+
+        $contact = MyApp\Models\Contacts::findFirst("id = '{$id}'");
+
+        $result = $contact->delete();
+        if ($result) {
+            $response->setStatusCode(200, 'Deleted');
+
+            $response->setJsonContent(
+                [
+                    'status' => 'OK',
+                    'data' => $contact->id,
+                ]
+            );
+            return $response;
+
+        } else {
+            //Если данные не далены
+            $response->setJsonContent(
+                [
+                    'status' => 'ERROR',
+                    'messages' => 'ERROR from Deleting',
+                ]);
+            return $response;
+        }
+    }
 
 }
